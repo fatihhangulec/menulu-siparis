@@ -5,7 +5,9 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server,path: "/siparis" });
+const wss = new WebSocket.Server({ noServer: true,path: "/siparis" });
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -28,6 +30,19 @@ wss.on('connection', (ws) => {
   });
 });
 
-server.listen(8080, () => {
+server.on('upgrade', (request, socket, head) => {
+  const pathname = request.url;
+
+  if (pathname === '/siparis') {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
   console.log('Server çalışıyor https://siparis-sistemi.fatihhangulec.com/siparis');
 });
