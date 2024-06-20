@@ -83,7 +83,7 @@
         console.log(order.items)
     }
 
-    const ws = new WebSocket('ws://siparis-sistemi.fatihhangulec.com/siparis');
+    const ws = new WebSocket('wss://siparis-sistemi.fatihhangulec.com/siparis');
 
     ws.onopen = () => {
       console.log('Connected to the server');
