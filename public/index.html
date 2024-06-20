@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <style>
+    #orders {
+      font-family: Arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #orders td, #orders th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    #orders tr:nth-child(even){background-color: #f2f2f2;}
+
+    #orders th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <table id="orders">
+    <tr>
+      <th>Masa</th>
+      <th>Sipariş</th>
+      <th>Toplam Ücret</th>
+    </tr>
+  </table>
+  <audio id="notification" src="notification.mp3" preload="auto"></audio>
+  <script>
+    const ws = new WebSocket('ws://siparis-sistemi.fatihhangulec.com/siparis');
+
+
+    ws.onopen = () => {
+      console.log('Connected to the server');
+    };
+
+    ws.onmessage = (event) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const order = JSON.parse(reader.result);
+
+        
+          // Admin panelinde siparişi göster
+          const table = document.getElementById('orders');
+          const newRow = table.insertRow();
+          const cell1 = newRow.insertCell(0);
+          const cell2 = newRow.insertCell(1);
+          const cell3 = newRow.insertCell(2);
+          cell1.innerHTML = order.table;
+          for (const item of order.items) {
+            cell2.innerHTML += (item + ", ")
+          }
+          // cell2.innerHTML = toString(order.items);
+          cell3.innerHTML = order.total
+  
+          // Bildirim sesini çal
+          const notification = document.getElementById('notification');
+          notification.play();
+      };
+      reader.readAsText(event.data);
+    };
+
+    ws.onclose = () => {
+      console.log('Disconnected from the server');
+    };
+  </script>
+</body>
+</html>
